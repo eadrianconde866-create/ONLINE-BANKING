@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Banking Portal</title>
+  <style>
+    :root {
+      --bg: #0b1b33;
+      --card: rgba(255, 255, 255, 0.12);
+      --card-strong: rgba(255, 255, 255, 0.18);
+      --text: #f7f9ff;
+      --accent: #4bb7ff;
+      --accent-soft: rgba(75, 183, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top right, rgba(75, 183, 255, 0.18), transparent 30%),
+                  linear-gradient(160deg, #07121f 0%, #0b1b33 40%, #0b203f 100%);
+      overflow: auto;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .scene span {
+      position: absolute;
+      display: block;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      filter: blur(16px);
+      animation: float 12s ease-in-out infinite;
+    }
+
+    .scene span:nth-child(1) { left: 10%; top: 15%; animation-duration: 14s; }
+    .scene span:nth-child(2) { left: 75%; top: 10%; width: 120px; height: 120px; animation-duration: 18s; }
+    .scene span:nth-child(3) { left: 45%; top: 68%; width: 70px; height: 70px; animation-duration: 11s; }
+    .scene span:nth-child(4) { left: 80%; top: 55%; width: 100px; height: 100px; animation-duration: 16s; }
+    .scene span:nth-child(5) { left: 25%; top: 55%; width: 130px; height: 130px; animation-duration: 22s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); opacity: 0.7; }
+      50% { transform: translate(20px, -30px); opacity: 0.4; }
+    }
+
+    .container {
+      position: relative;
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 64px 0;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .hero {
+      max-width: 520px;
+      z-index: 1;
+      animation: slideInLeft 0.9s ease-out;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      line-height: 1.02;
+      margin-bottom: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      color: rgba(247, 249, 255, 0.78);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    .hero .features {
+      display: grid;
+      gap: 16px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 18px 20px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    .feature span {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(75, 183, 255, 0.18);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .feature strong {
+      font-size: 0.98rem;
+    }
+
+    .card-panel {
+      display: grid;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+      animation: slideInRight 0.9s ease-out;
+    }
+
+    .panel-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.16);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      transition: transform 0.35s ease;
+    }
+
+    .panel-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .panel-card header {
+      padding: 28px 28px 12px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .panel-card header h2 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    .panel-card header p {
+      color: rgba(247, 249, 255, 0.72);
+      font-size: 0.95rem;
+    }
+
+    .login-card {
+      padding: 32px;
+    }
+
+    .login-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 14px;
+    }
+
+    .login-card p {
+      color: rgba(247, 249, 255, 0.72);
+      font-size: 0.98rem;
+      margin-bottom: 24px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(247, 249, 255, 0.78);
+      font-size: 0.92rem;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .field input:focus {
+      border-color: rgba(75, 183, 255, 0.65);
+      box-shadow: 0 0 0 4px rgba(75, 183, 255, 0.12);
+    }
+
+    .cta-button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #4bb7ff, #37d4bb);
+      color: #0b1b33;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(75, 183, 255, 0.28);
+    }
+
+    .dashboard {
+      display: none;
+      gap: 24px;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .dashboard.active {
+      display: grid;
+    }
+
+    .account-summary {
+      padding: 28px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .balance-card {
+      display: grid;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .balance-card strong {
+      font-size: 2.25rem;
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: -0.03em;
+    }
+
+    .balance-card span {
+      color: rgba(247, 249, 255, 0.74);
+      font-size: 0.98rem;
+    }
+
+    .transactions {
+      display: grid;
+      gap: 14px;
+    }
+
+    .transaction {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .transaction:hover {
+      transform: translateX(4px);
+    }
+
+    .transaction-info {
+      display: grid;
+      gap: 4px;
+    }
+
+    .transaction-info strong {
+      font-size: 0.98rem;
+    }
+
+    .transaction-info span {
+      color: rgba(247, 249, 255, 0.64);
+      font-size: 0.88rem;
+    }
+
+    .status {
+      font-weight: 700;
+      color: #70ffb3;
+    }
+
+    .support-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .support-card h3 {
+      font-size: 1.2rem;
+    }
+
+    .support-card p {
+      color: rgba(247, 249, 255, 0.72);
+      line-height: 1.75;
+    }
+
+    .support-card .link {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      gap: 8px;
+    }
+
+    .payment-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .payment-card header h3 {
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+    }
+
+    .payment-card header p {
+      color: rgba(247, 249, 255, 0.72);
+      line-height: 1.6;
+    }
+
+    .payment-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .payment-card .field input {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .payment-message {
+      color: #70ffb3;
+      font-size: 0.95rem;
+      min-height: 1.2rem;
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-card {
+        margin-top: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 32px 0;
+      }
+
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+
+      .panel-card header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="container">
+    <section class="hero">
+      <h1>Secure online banking with smooth transitions.</h1>
+      <p>Manage your accounts, pay your bills, review recent transactions, and transfer funds with a modern interface designed for speed and clarity.</p>
+      <div class="features">
+        <div class="feature">
+          <span>1</span>
+          <div>
+            <strong>Fast access</strong>
+            <p>Sign in quickly with a clean login experience.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span>2</span>
+          <div>
+            <strong>Real-time insights</strong>
+            <p>See balances, spending, and alerts in one view.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span>3</span>
+          <div>
+            <strong>Secure support</strong>
+            <p>Contact help along with guided dashboard actions.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span>4</span>
+          <div>
+            <strong>Bill payments</strong>
+            <p>Pay your bills quickly and keep all your due dates in one place.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-panel">
+      <article class="panel-card login-card" id="loginCard">
+        <header>
+          <div>
+            <h2>Welcome back</h2>
+            <p>Enter your account details to continue.</p>
+          </div>
+          <div>
+            <span>Bank</span>
+          </div>
+        </header>
+        <div>
+          <h3>Login to your account</h3>
+          <p>We keep your data protected with layered security and encrypted sessions.</p>
+          <div class="field">
+            <label for="userEmail">Email address</label>
+            <input type="email" id="userEmail" placeholder="alex@example.com" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="userPassword">Password</label>
+            <input type="password" id="userPassword" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+          <button class="cta-button" id="loginBtn">Login</button>
+        </div>
+      </article>
+
+      <article class="panel-card dashboard" id="dashboardCard">
+        <header>
+          <div>
+            <h2>Your dashboard</h2>
+            <p>Welcome to your personalized banking portal.</p>
+          </div>
+          <button class="cta-button" id="logoutBtn" style="width: auto; padding: 12px 18px; background: rgba(255,255,255,0.12); color: var(--text);">Sign out</button>
+        </header>
+        <div class="account-summary">
+          <div class="balance-card">
+            <strong id="balanceValue">$12,450.75</strong>
+            <span>Checking account balance</span>
+          </div>
+          <div class="transactions">
+            <div class="transaction">
+              <div class="transaction-info">
+                <strong>Electricity bill</strong>
+                <span>Auto pay • Jun 28</span>
+              </div>
+              <div class="status">- $134.20</div>
+            </div>
+            <div class="transaction">
+              <div class="transaction-info">
+                <strong>Salary deposit</strong>
+                <span>Direct deposit • Jun 27</span>
+              </div>
+              <div class="status" style="color: #70ffb3;">+ $3,250.00</div>
+            </div>
+            <div class="transaction">
+              <div class="transaction-info">
+                <strong>Online transfer</strong>
+                <span>To savings • Jun 26</span>
+              </div>
+              <div class="status">- $500.00</div>
+            </div>
+          </div>
+        </div>
+        <div class="payment-card">
+          <header>
+            <div>
+              <h3>Bill payments</h3>
+              <p>Pay a vendor directly from your checking account and track the payment instantly.</p>
+            </div>
+          </header>
+          <div class="payment-form">
+            <div class="field">
+              <label for="payee">Payee</label>
+              <input type="text" id="payee" placeholder="Utility company, provider, etc.">
+            </div>
+            <div class="field">
+              <label for="amount">Amount</label>
+              <input type="number" step="0.01" min="0.01" id="amount" placeholder="120.00">
+            </div>
+            <div class="field">
+              <label for="dueDate">Due date</label>
+              <input type="date" id="dueDate">
+            </div>
+            <button class="cta-button" id="payBillBtn">Pay bill</button>
+          </div>
+          <div class="payment-message" id="paymentMessage"></div>
+        </div>
+        <div class="support-card">
+          <h3>Need help?</h3>
+          <p>If you experience issues, our banking support is available 24/7 with secure chat and guided fraud protection.</p>
+          <a href="#" class="link">Contact support →</a>
+        </div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginCard = document.getElementById('loginCard');
+    const dashboardCard = document.getElementById('dashboardCard');
+    const payBillBtn = document.getElementById('payBillBtn');
+    const payeeInput = document.getElementById('payee');
+    const amountInput = document.getElementById('amount');
+    const dueDateInput = document.getElementById('dueDate');
+    const paymentMessage = document.getElementById('paymentMessage');
+    const balanceValue = document.getElementById('balanceValue');
+    const transactionList = document.querySelector('.transactions');
+
+    const formatCurrency = value => '$' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    payBillBtn.addEventListener('click', () => {
+      const payee = payeeInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const dueDate = dueDateInput.value;
+
+      if (!payee || isNaN(amount) || amount <= 0) {
+        alert('Enter a payee and a valid amount.');
+        return;
+      }
+
+      const currentBalance = parseFloat(balanceValue.textContent.replace(/[$,]/g, ''));
+      if (amount > currentBalance) {
+        alert('Insufficient funds for this payment.');
+        return;
+      }
+
+      const paymentDate = dueDate ? new Date(dueDate) : new Date();
+      const formattedDate = paymentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const newBalance = currentBalance - amount;
+
+      balanceValue.textContent = formatCurrency(newBalance);
+
+      const item = document.createElement('div');
+      item.className = 'transaction';
+      item.innerHTML = `
+        <div class="transaction-info">
+          <strong>${payee}</strong>
+          <span>Bill payment • ${formattedDate}</span>
+        </div>
+        <div class="status">- ${formatCurrency(amount)}</div>
+      `;
+      transactionList.prepend(item);
+
+      paymentMessage.textContent = `Your payment to ${payee} for ${formatCurrency(amount)} has been scheduled.`;
+      payeeInput.value = '';
+      amountInput.value = '';
+      dueDateInput.value = '';
+
+      setTimeout(() => {
+        paymentMessage.textContent = '';
+      }, 5000);
+    });
+
+    loginBtn.addEventListener('click', () => {
+      const email = document.getElementById('userEmail').value.trim();
+      const password = document.getElementById('userPassword').value.trim();
+      if (!email || !password) {
+        alert('Enter email and password to continue.');
+        return;
+      }
+
+      loginCard.style.opacity = '0';
+      loginCard.style.transform = 'translateY(-16px)';
+      setTimeout(() => {
+        loginCard.style.display = 'none';
+        dashboardCard.classList.add('active');
+        dashboardCard.style.opacity = '0';
+        dashboardCard.style.transform = 'translateY(12px)';
+        setTimeout(() => {
+          dashboardCard.style.opacity = '1';
+          dashboardCard.style.transform = 'translateY(0)';
+        }, 50);
+      }, 260);
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      dashboardCard.classList.remove('active');
+      dashboardCard.style.opacity = '0';
+      dashboardCard.style.transform = 'translateY(-12px)';
+      setTimeout(() => {
+        dashboardCard.style.display = 'none';
+        loginCard.style.display = 'block';
+        loginCard.style.opacity = '0';
+        loginCard.style.transform = 'translateY(12px)';
+        setTimeout(() => {
+          loginCard.style.opacity = '1';
+          loginCard.style.transform = 'translateY(0)';
+        }, 50);
+      }, 240);
+    });
+  </script>
+</body>
+</html>
